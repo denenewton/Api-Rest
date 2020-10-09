@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Games</title>
+    <link rel="stylesheet" href="./node_modules/bootstrap/compiler/bootstrap.css">
+</head>
+
+<body>
+    <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+            <div class="row">
+               <div class="col-12"> 
+                   <h1 class="display-4 text-center">Listagem e Edição de Games</h1>
+               </div>   
+            </div>
+        </div>
+    </div>
+
+  <div class="container">
+           <div class="row">
+            <div class="col-sm-6 col-md-6 mt-4">
+                <h4 class="card-title">Cadastrar Game</h4>
+                <div class="card mb-5">
+                 <div class="card-body">
+                     <input type="text" name="titulo" id="titulo" placeholder="Titulo do game" class="form-control mb-3" required>
+                     <input type="number" name="ano" id="ano" class="form-control mb-3" placeholder="Ano de lançamento"required>
+                     <input type="number" name="preço" id="preço" class="form-control mb-3" placeholder="Preço do game" required>
+                     <button type="button" class="btn btn-primary" onclick="criarGame()" >Cadastrar</button>
+                 </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-md-6 mt-4">
+                <h4 class="card-title">Editar Game</h4>
+                <div class="card mb-5">
+                 <div class="card-body">
+                     <input type="hidden" name="idED" id="idED" >
+                     <input type="text" name="tituloED" id="tituloED" placeholder="Titulo do game" class="form-control mb-3" required>
+                     <input type="number" name="anoED" id="anoED" class="form-control mb-3" placeholder="Ano de lançamento" required>
+                     <input type="number" name="preçoED" id="preçoED" class="form-control mb-3" placeholder="Preço do game" required>
+                     <button type="button" class="btn btn-primary" onclick="salvarEdicao()">Editar</button>
+                 </div>
+                </div>
+            </div>
+        </div>
+            <div class="row text-content-center">
+                <div class="col-12">
+                    <h4 class="card-title">Lista de  Games</h4>
+                    <div class="card">
+                        <div class="card-body">
+                            <table class="table">
+                                <thead>
+                                  <tr>
+                                    <th scope="col">id</th>
+                                    <th scope="col">Titulo</th>
+                                    <th scope="col">Ano</th>
+                                    <th scope="col">Preço</th>
+                                    <th scope='col'>Ação</th>
+                                  </tr>
+                                </thead>
+                                <tbody id="games">
+                            <!-- conteúdo vem pra cá dinamicamete com javascript-->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+  </div>
+ 
+
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    
+    <script>
+
+
+        axios.get('http://localhost:3001/games').then((request)=>{
+    
+            var games = request.data
+            var tbody = document.getElementById('games')
+            games.forEach(game => {
+            
+            tbody.innerHTML += `
+             <tr>
+             <td scope="row">${game.id}</td>
+             <td data-t="${game.titulo}" id="data-titulo">${game.titulo}</td>
+             <td>${game.ano}</td>
+             <td>${game.preco}</td>
+             <td><button type="button" class="btn btn-danger" onclick="deletarGame(${game.id})">deletar</button>
+     <button type="button" class="btn btn-success ml-2 " onclick="editarGame(${game.id})">editar</button></td>
+             </tr> 
+            ` 
+            
+        })
+
+        }).catch( erro => {
+            console.log(erro)
+        })
+
+        
+        function salvarEdicao(){
+            
+            var id = document.getElementById('idED').value
+            var imputTitle = document.getElementById('tituloED')
+            var imputAno = document.getElementById('anoED')
+            var imputPreco= document.getElementById('preçoED')
+         
+            var game = {
+                titulo: imputTitle.value,
+                ano: imputAno.value,
+                preco: imputPreco.value
+            }
+            
+         axios.put('http://localhost:3001/game/'+id, game).then( res=> {
+             if (res.status == 200){
+                alert('Editado com sucesso!')
+             }
+         }).catch(erro => {
+             console.log('erro na Edicao: ' + erro)
+         })
+
+        }
+
+        function editarGame(id){
+    
+            axios.get('http://localhost:3001/game/'+id).then( res =>{
+
+                document.getElementById('idED').value = res.data.id
+                document.getElementById('tituloED').value = res.data.titulo
+                document.getElementById('anoED').value = res.data.ano
+                document.getElementById('preçoED').value = res.data.preco
+
+            })
+            
+            
+
+        }
+        
+        function criarGame(){
+
+            var imputTitle = document.getElementById('titulo')
+            var imputAno = document.getElementById('ano')
+            var imputPreco= document.getElementById('preço')
+
+            var game = {
+                titulo: imputTitle.value,
+                ano: imputAno.value,
+                preco: imputPreco.value
+            }
+            
+            axios.post('http://localhost:3001/game', game).then( res => {
+                alert('cadastrado com sucesso!')
+            }).catch( erro =>{
+                console.log(erro)
+            })
+
+        }
+
+        function deletarGame(id){
+            axios.delete('http://localhost:3001/game/'+id).then( () =>{
+                alert('Item deletado com sucesso!')
+            }).catch( erro => {
+                console.log(erro)
+            })
+        }
+
+
+    </script>
+
+
+ <div class="jumbotron jumbotron-fluid mt-4 mb-4">
+    <div class="container">
+        <div class="row">
+           <div class="col-12"> 
+               <P class="lead text-center">Listagem e Edição de Games</p>
+                <P class="lead text-center text-muted">&copy; denenewton</p>
+           </div>   
+        </div>
+    </div>
+</div>
+</body>
+<script src="./node_modules/jquery/dist/jquery.js"></script>
+<script src="./node_modules/popper.js/dist/umd/popper.js"></script>
+<script src="./node_modules/bootstrap/dist/js/bootstrap.js"></script>
+
+</html>
