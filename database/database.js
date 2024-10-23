@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize')
 
-const sequelize = new Sequelize('apigames', 'root', 'tigre225',{
+const sequelize = new Sequelize('apigames', 'root', '',{
     host: 'localhost',
     dialect: "mysql",
     timezone: '-03:00'
